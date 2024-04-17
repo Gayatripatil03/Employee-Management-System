@@ -7,28 +7,40 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ness.emps.utils.JwtTokenUtil;
 
 import io.jsonwebtoken.Claims;
 
+import java.util.logging.Logger;
+
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
-	
 	private final JwtTokenUtil jwtTokenUtil;
 	
 	private UserDetailsServiceImpl userDetailsServiceImpl;
 	
+    private static final Logger log = Logger.getLogger(JwtAuthenticationFilter.class.getName());
+
 	
 	public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil,UserDetailsServiceImpl userDetailsServiceImpl) {
 		this.jwtTokenUtil = jwtTokenUtil;
 		this.userDetailsServiceImpl = userDetailsServiceImpl;
 	}
+	
+	public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil) {
+		this.jwtTokenUtil = jwtTokenUtil;
+	}
+	
+	@Bean
+    public UserDetailsServiceImpl userDetailsService() {
+        return new UserDetailsServiceImpl();
+    }
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -38,55 +50,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 	    String username = null;
 	    String jwt = null;
 
+        log.info("Entered JwtAuthenticationFilter");
+
+        log.info("AuthorizationHeader is: "+authorizationHeader);
 	    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-	        jwt = authorizationHeader.substring(7);
-	        username = jwtTokenUtil.extractUsername(jwt);
+	        jwt = authorizationHeader;
+	        log.info("jwt is: "+jwt);
+	        username = jwtTokenUtil.extractUsername(jwt.substring(7));
+	        log.info("Username is: "+username);
 	    }
+	    
+	    if (request.getRequestURI().equals("/login_req")) {
+            if (jwt == null) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT token is required");
+                return;
+            }
+        }  
+	    
 
 	    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-	        // Validate token
+	    	log.info("Entered for jwt validation");
 	        String validationStatus = jwtTokenUtil.validateToken(jwt);
+            log.info("Validation status of token: " + validationStatus);
 	        if ("valid".equals(validationStatus)) {
-	            // Extract user roles from JWT claims
+	        	log.info("Entered into validstatus condition");
 	            Claims claims = jwtTokenUtil.extractAllClaims(jwt);
+	            log.info("Claims value are: "+claims);
 	            String role = (String) claims.get("role");
+	            log.info("Role of user is: "+role);
 
-	            // Authenticate the user with roles
 	            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsernameAndRole(username, role);
+	            log.info("UserDetails are: "+userDetails);
 	            if (userDetails != null) {
-	                // Check if the user roles match the roles in the token
-	                if (userDetails.getAuthorities().contains(role) && isRoleAllowedForEndpoint(role, request.getRequestURI())) {
 	                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 	                            userDetails, null, userDetails.getAuthorities());
-	                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 	                    SecurityContextHolder.getContext().setAuthentication(authentication);
 	                } else {
-	                    // Role mismatch or endpoint not allowed
 	                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
 	                    return;
 	                }
 	            }
 	        }
-	    }
+	    
 
 	    filterChain.doFilter(request, response);
-	}
+	}   
+}   
 
-	// Method to check if the role is allowed for the requested endpoint
-	private boolean isRoleAllowedForEndpoint(String role, String endpoint) {
-	    // Check if the endpoint is for admin, manager, or user
-	    if (endpoint.startsWith("/admin") && role.equals("ROLE_ADMIN")) {
-	        return true;
-	    } else if (endpoint.startsWith("/manager") && role.equals("ROLE_MANAGER")) {
-	        return true;
-	    } else if (endpoint.startsWith("/user") && role.equals("ROLE_USER")) {
-	        return true;
-	    }
-	    
-	    // Add more checks if you have additional roles and endpoints
-
-	    // If no specific check matches, deny access
-	    return false;
-	}
-
-}

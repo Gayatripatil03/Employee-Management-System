@@ -2,23 +2,24 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="base::Layout(~{::section})">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Signin Form</title>
 </head>
 <body>
 <section>
     <div class="container p-5">
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <div class="card-header text-center fs-4">Login Page</div>
+                <div class="card-header text-center fs-4">Signin Page</div>
                 
-              <div th:if="${param.error}" class="alert alert-danger">
-                  Invalid username & Password</div>
+                <div th:if="${error}" class="alert alert-danger">
+    				<span th:text="${error}"></span>
+				</div>
                   
                   <div th:if="${param.logout}" class="alert alert-success">
                   Logout Sucessfully</div>
                   
                 <div class="card-body">
-                    <form action="/login" method="post">
+                    <form action="/login_req" method="post">
                         <div class="mb-3">
                             <label>Enter your email id</label>
                             <input type="text" name="username" class="form-control" autocomplete="off">
@@ -27,8 +28,14 @@
                             <label>Enter password</label>
                             <input type="password" name="password" class="form-control">
                         </div>
+                        <div class="mb-3">
+                            <label>Enter token</label>
+                            <input type="token" name="token" class="form-control">
+                        </div>
+                        
 
                         <button class="btn btn-success col-md-12">Login</button>
+                     
                     </form>
                     
                     <div class="text-center mt-2">
@@ -39,7 +46,7 @@
             </div>
         </div>
     </div>
-    </div>
+ </div>
 </section>
 </body>
 </html>

@@ -17,21 +17,17 @@
         <!-- Add hidden form field to handle update-->
         <input type = "hidden" th:field="*{id}" />
 
-        <input type="text" th:field="*{fullName}" name="fullName" placeholder="Enter your FullName" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{address}" name="address" placeholder="Enter your address" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{email}" name="email" placeholder="Enter your email" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{phone}" name="phone" placeholder="Enter your mobile no" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{empPosition}" name="empPosition" placeholder="Enter employee position" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{empDepartment}" name="empDepartment" placeholder="Enter employee department" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{empSalary}" name="empSalary" placeholder="Enter employee salary" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{password}" name="password" placeholder="Enter your password" class="form-control mb-4 col-4" READONLY>
-        <input type="text" th:field="*{role}" name="role" placeholder="Enter user role" class="form-control mb-4 col-4" READONLY>
-        
+        <input type="text" th:field="*{fullName}" name="fullName" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{address}" name="address" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{email}" name="email" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{empPosition}" name="empPosition" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{empDepartment}" name="empDepartment" class="form-control mb-4 col-4">
+        <input type="text" th:field="*{empSalary}" name="empSalary" class="form-control mb-4 col-4">
 
         <button type = "submit" class="btn btn-info col-2"> Update Employee</button>
     </form>
-    <a class="nav-link active" aria-current="page" href="/user/employeelist">Back to employee page</a>
- 
+    <hr>
+    <a th:href="@{/}">Back to Employee List</a>
 </div>
 </body>
 </html>

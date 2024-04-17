@@ -5,42 +5,58 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.*;
+
 
 @Entity
 public class UserDtls {
-	
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+    @NotNull(message = "Full name is required")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "Full name can only contain alphabetic characters and spaces")
 	@Column(name = "full_Name")
 	private String fullName;
+
 
 	@Column
 	private String token;
 	
+    @NotNull(message = "Email is required")
+    @Email(message = "Invalid email format")  
 	@Column
 	private String email;
 
+    @NotNull(message = "Address is required")
+    @Size(min = 4, max = 30, message = "Address must be between 4 and 30 characters long")
 	@Column
 	private String address;
 
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "Employee position can only contain alphabetic characters and spaces")    
 	@Column(name = "emp_Position")
 	private String empPosition;
 
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "Employee department can only contain alphabetic characters and spaces")
 	@Column(name = "emp_Dept")
 	private String empDepartment;
 
+    @DecimalMin(value = "0.01", message = "Employee salary must be greater than 0")
 	@Column(name = "emp_Salary")
 	private Float empSalary;
 
+    @NotNull(message = "Phone is required")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits long and contain only numbers")
 	@Column
 	private String phone;
 
+    @NotNull(message = "Password is required")
 	@Column
 	private String password;
 
+    @NotNull(message = "Role is required")
+    @Pattern(regexp = "ROLE_(USER|ADMIN|MANAGER)", message = "Role must be ROLE_USER, ROLE_ADMIN, or ROLE_MANAGER")
 	@Column
 	private String role;
 	
@@ -48,7 +64,7 @@ public class UserDtls {
 	
 	public UserDtls() {
 		
-	}
+	} 
 	
 	public UserDtls(Long id,String fullName,String token, String email, String address, String empPosition, String empDepartment,
 			Float empSalary, String phone, String password, String role,String expirationTime) {
@@ -155,52 +171,6 @@ public class UserDtls {
 		this.role = role;
 	}
 
-	
-
-	
-
-
-	public boolean validateFullName() {
-		return fullName != null && !fullName.trim().equals("");
-	}
-
-	public boolean validateEmail() {
-		// Implement email validation logic
-		return email != null && !email.trim().equals("") &&
-				email.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-	}
-
-	public boolean validateAddress() {
-		return address != null && !address.trim().equals("");
-	}
-
-	public boolean validateEmpPosition() {
-		return empPosition != null && !empPosition.trim().equals("");
-	}
-
-	public boolean validateEmpDepartment() {
-		return empDepartment != null && !empDepartment.trim().equals("");
-	}
-
-	public boolean validateEmpSalary() {
-		return empSalary != null && empSalary > 0; // Assuming salary cannot be negative
-	}
-
-	public boolean validatePhone() {
-		// Implement phone number validation logic
-		return phone != null && !phone.trim().equals("") &&
-				phone.matches("\\d{10}"); // Assuming phone number is a 10-digit number
-	}
-
-	public boolean validatePassword() {
-		// Implement password validation logic
-		return password != null && password.length() >= 12; // Assuming password should be at least 6 characters long
-	}
-
-	public boolean validateRole() {
-		return role != null && !role.trim().equals("");
-	}
-	
 	public String getExpirationTime() {
 		return expirationTime;
 	}
@@ -208,4 +178,12 @@ public class UserDtls {
 	public void setExpirationTime(String expirationTime) {
 		this.expirationTime = expirationTime;
 	}
+
+	public String toString() {
+		return "UserDtls [id=" + id + ", fullName=" + fullName + ", token=" + token + ", email=" + email + ", address="
+				+ address + ", empPosition=" + empPosition + ", empDepartment=" + empDepartment + ", empSalary="
+				+ empSalary + ", phone=" + phone + ", password=" + password + ", role=" + role + ", expirationTime="
+				+ expirationTime + "]";
+	}
+	   
 }

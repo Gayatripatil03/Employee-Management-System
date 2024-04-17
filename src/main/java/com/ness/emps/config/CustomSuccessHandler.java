@@ -1,6 +1,5 @@
 package com.ness.emps.config;
 
-
 import java.io.IOException;
 import java.util.Set;
 
@@ -13,24 +12,28 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-@Configuration
-public class CustomSuccessHandler implements AuthenticationSuccessHandler {
-	
 
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) throws IOException, ServletException {
-			
-		 Set<String> roles= AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-		 
-		 if(roles.contains("ROLE_ADMIN")) {
-			 response.sendRedirect("/admin/");
-		 }
-		 else if(roles.contains("ROLE_MANAGER")) {
-			 response.sendRedirect("/manager/");
-		 }
-		 else {
-			 response.sendRedirect("/user/");
-		 }
-		 
+	
+	@Configuration
+	public class CustomSuccessHandler implements AuthenticationSuccessHandler {
+		
+
+		public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+				Authentication authentication) throws IOException, ServletException {
+				
+			 Set<String> roles= AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+			 
+			 if(roles.contains("ROLE_ADMIN")) {
+				 response.sendRedirect("/admin/");
+			 }
+			 else if(roles.contains("ROLE_MANAGER")) {
+				 response.sendRedirect("/manager/");
+			 }
+			 else {
+				 response.sendRedirect("/user/");
+			 }
+			 
+		}
 	}
-}
+
+

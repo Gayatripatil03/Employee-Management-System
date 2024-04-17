@@ -54,7 +54,5 @@ public class JwtReqRes {
 	public void setToken(String token) {
 		this.token = token;
 	}
-
-
 	
 }

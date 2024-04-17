@@ -11,15 +11,18 @@
 <div class="container">
     <h1>Employee Management System</h1>
     <hr>
-    <h2>Save Employee</h2>
-    <form action="#" th:action="@{/user/employeelist/saveEmployee}" th:object = "${employee}" method="POST">
+    <h2>Add Employee</h2>
+    <th:block th:if="${session.msg}">
+              <p class="text-center fs-4 text-success">[[${session.msg}]]</p>
+              <th:block th:text="${#session.removeAttribute('msg')}"></th:block>
+    </th:block>
+    <form action="#" th:action="@{/saveEmployee}" th:object = "${employee}" method="POST">
         <input type="text" th:field="*{fullName}" name="fullName" placeholder="Employee Name" class="form-control mb-4 col-4">
         <input type="text" th:field="*{address}" name="address" placeholder="Employee Address" class="form-control mb-4 col-4">
         <input type="text" th:field="*{email}" name="email" placeholder="Employee mailId" class="form-control mb-4 col-4">
         <input type="text" th:field="*{empPosition}" name="empPosition" placeholder="Employee Position" class="form-control mb-4 col-4">
         <input type="text" th:field="*{empDepartment}" name="empDepartment" placeholder="Employee Department" class="form-control mb-4 col-4">
         <input type="text" th:field="*{empSalary}" name="empSalary" placeholder="Employee Salary" class="form-control mb-4 col-4">
-        <input type="text" th:field="*{phone}" name="phone" placeholder="Employee Phone No" class="form-control mb-4 col-4">
 
         <button type = "submit" class="btn btn-info col-2"> Save Employee</button>
     </form>

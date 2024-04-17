@@ -1,6 +1,8 @@
 package com.ness.emps.config;
 
 
+import java.util.logging.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +20,9 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 
 	@Autowired
 	private UserRepository userRepo;
+	
+    private static final Logger log = Logger.getLogger(JwtAuthenticationFilter.class.getName());
+
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		
@@ -30,7 +35,8 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	}
 	
 	public UserDetails loadUserByUsernameAndRole(String email, String role) throws UsernameNotFoundException {
-	    UserDtls user = userRepo.findByEmailAndRole(email, role); // Assuming you have a method to find user by email and role
+		log.info("Enter into method loadUserByUsernameAndRole ");
+	    UserDtls user = userRepo.findByEmailAndRole(email, role); 
 	    if (user != null) {
 	        return new CustomUserDetails(user);
 	    }

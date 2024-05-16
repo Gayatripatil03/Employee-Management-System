@@ -2,22 +2,29 @@ package com.ness.emps.controller;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.NoSuchElementException;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.ness.emps.model.UserDtls;
 import com.ness.emps.repository.UserRepository;
@@ -37,9 +44,30 @@ public class ManagerController {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncode;
 	
-	private static final Logger log = Logger.getLogger(HomeController.class.getName());
+	Logger log = LoggerFactory.getLogger(ManagerController.class);
+
 	
-	@GetMapping("/")
+	@ModelAttribute
+	private void userDetails(Model m,Principal p) {
+		if(p != null){
+		log.info("Principal value is present");
+			String email = p.getName();
+			UserDtls user =  userRepo.findByEmail(email);
+			if(user != null){
+			    log.info("user value is present: "+user);
+				m.addAttribute("user", user);
+			}
+		}
+	}
+	
+	@RequestMapping(value="/profile")
+	public String profile(Model model,Principal principal) {
+		String un =principal.getName();
+		model.addAttribute("employee",userRepo.findByEmail(un));
+		return "manager/profile";
+	}
+	
+	@GetMapping("/home")
 	public String home() {
 		return "manager/home";
 	}
@@ -47,7 +75,7 @@ public class ManagerController {
 	@GetMapping("/changePass")
 	public String loadChangePassword() 
 	{
-		return "/change_password";
+		return "manager/change_password";
 	}
 	
 	
@@ -80,6 +108,18 @@ public class ManagerController {
 		return "redirect:/manager/changePass";
 	}
 	
+	@GetMapping("/employees")
+	public String getEmployees(Model model,String keyword)
+	{
+		if(keyword != null) {
+			model.addAttribute("listEmployees", userService.findBYKeyword(keyword));
+		}
+		else {
+			model.addAttribute("listEmployees", userService.getAllEmployees());
+		}
+		return "manager/employee_search";
+	}
+	
 	@GetMapping("/employeelist")
 	public String viewHomePage(Model model) {
 		return findPaginated(1,"fullName","asc",model);
@@ -105,92 +145,147 @@ public class ManagerController {
 
 			
 			model.addAttribute("listEmployees", listEmployees);
-			return "employeelist";
+			return "manager/employeelist";
 			
 			
 		}
 		
 		
 		@GetMapping(value = "/employeelist/showNewEmployeeForm")
-		public String showNewEmployeeForm(Model model){
-			UserDtls employee = new UserDtls();
-			model.addAttribute("employee",employee);
-			return "new_employee";
+		public String showNewEmployeeForm(Model model,HttpSession session){
+            session.setAttribute("msg", "You don't have permission to add a new employee");
+			return "redirect:/manager/employeelist";
 		}
 
 
 		@PostMapping("/employeelist/saveEmployee")
-		public String saveEmployee(@ModelAttribute("employee") UserDtls employee, HttpSession session) {
-		    UserDtls existingUser = userRepo.findByEmail(employee.getEmail());
-		    if (existingUser != null) {
-		    	log.info("User with this email id already exists");
-		        session.setAttribute("msg", "User with this email id already exists");
-		        return "redirect:/manager/employeelist/showNewEmployeeForm";
-		    }
-
-		    userService.saveEmployee(employee);
-	    	log.info("Employee added successfully");
-		    session.setAttribute("msg", "Employee added successfully");
-		    return "redirect:/manager/employeelist/showNewEmployeeForm";
+		public String saveEmployee(@Valid @ModelAttribute("employee") UserDtls employee,BindingResult bindingResult, HttpSession session) {
+			session.setAttribute("msg", "You don't have permission to add a new employee");
+			return "redirect:/manager/employeelist";
 		}
+
+		 
 
 
 		@GetMapping("/employeelist/showFormForUpdate/{id}")
-		public String showFormForUpdate(@PathVariable (value= "id")long id,Model model){
-			UserDtls employee = userService.getEmployeeById(id);
-			model.addAttribute("employee",employee);
-			return "update_employee";
+		public String showFormForUpdate(@PathVariable(value= "id") long id, Model model, Principal principal, HttpSession session){
+		    String loggedInEmail = principal.getName();
+		    
+
+		    UserDtls loggedInManager = userRepo.findByEmail(loggedInEmail);
+		    
+		    if (loggedInManager == null) {
+		        session.setAttribute("msg", "Logged-in manager details not found.");
+		        return "redirect:/manager/employeelist";
+		    }
+
+		    UserDtls employeeToUpdate = userService.getEmployeeById(id);
+
+		    if (employeeToUpdate == null) {
+		        session.setAttribute("msg", "Employee with this ID does not exist.");
+		        return "redirect:/manager/employeelist";
+		    }
+
+		    if (!loggedInManager.getRole().equals("ROLE_ADMIN") && !loggedInManager.getEmail().equals(employeeToUpdate.getEmail()) && !employeeToUpdate.getRole().equals("ROLE_USER")) {
+		        session.setAttribute("msg", "You don't have permission to update this employee's information.");
+		        return "redirect:/manager/employeelist";
+		    }
+		    
+		    if(employeeToUpdate.getId() == loggedInManager.getId()) {
+			    model.addAttribute("employee", employeeToUpdate);
+			    return "manager/manager_update_info";
+		    }
+
+		    model.addAttribute("employee", employeeToUpdate);
+		    return "manager/update_employee";
 		} 
+
+		
 		
 		@PostMapping("/employeelist/showFormForUpdate/saveUpdatedEmployee/{id}")
-		public ResponseEntity<String> saveUpdatedEmployee(
-		        @PathVariable("id") long id,
-		        @RequestParam("fullName") String fullName,
-		        @RequestParam("address") String address,
-		        @RequestParam("email") String email,
-		        @RequestParam("empPosition") String empPosition,
-		        @RequestParam("empDepartment") String empDepartment,
-		        @RequestParam("empSalary") float empSalary) {
+		public String saveUpdatedEmployee(@Valid @ModelAttribute("employee") UserDtls updatedEmployee,
+		                                  BindingResult bindingResult,
+		                                  @PathVariable("id") long id,
+		                                  Principal principal,
+		                                  HttpSession session,
+		                                  HttpServletResponse response,
+		                                  SessionStatus sessionStatus) {
+		    String loggedInEmail = principal.getName();
 
-		    UserDtls existingEmployeeId = userService.getEmployeeById(id);
+		    try {
+		        UserDtls existingEmployee = userRepo.findById(id)
+		                                .orElseThrow(() -> new NoSuchElementException("Employee not found for id :: " + id));
 
-		    if (existingEmployeeId == null) {
-		        log.info("User with this ID does not exist");
-		        return ResponseEntity.badRequest().body("User with this ID does not exist");
+		        UserDtls loggedInManager = userRepo.findByEmail(loggedInEmail);
+
+		        if (!loggedInManager.getRole().equals("ROLE_ADMIN") && !loggedInEmail.equals(existingEmployee.getEmail()) && !existingEmployee.getRole().equals("ROLE_USER")) {
+		            session.setAttribute("msg", "You don't have permission to update this employee's information.");
+		            return "redirect:/manager/employeelist/showFormForUpdate/" + id;
+		        }
+
+		        if (bindingResult.hasErrors()) {
+		            StringBuilder errorMessage = new StringBuilder("Validation errors occurred: ");
+		            bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append("; "));
+		            session.setAttribute("msg", errorMessage.toString());
+		            return "redirect:/manager/employeelist/showFormForUpdate/" + id;
+		        }
+
+		        if (!existingEmployee.getEmail().equals(updatedEmployee.getEmail())) {
+		            UserDtls existingUserWithEmail = userRepo.findByEmail(updatedEmployee.getEmail());
+		            if (existingUserWithEmail != null && !existingUserWithEmail.getId().equals(existingEmployee.getId())) {
+		                session.setAttribute("msg", "Email already exists for another user. Please provide another email.");
+		                return "redirect:/manager/employeelist/showFormForUpdate/" + id;
+		            }
+
+		            if (existingEmployee.getEmail().equals(loggedInEmail)) {
+		                existingEmployee.setFullName(updatedEmployee.getFullName());
+		                existingEmployee.setAddress(updatedEmployee.getAddress());
+		                existingEmployee.setEmail(updatedEmployee.getEmail());
+		                existingEmployee.setPhone(updatedEmployee.getPhone());
+		                existingEmployee.setBirthDate(updatedEmployee.getBirthDate());
+		                
+		                userRepo.save(existingEmployee);
+
+		                SecurityContextHolder.clearContext();
+		                sessionStatus.setComplete();
+		                Cookie cookie = new Cookie("JSESSIONID", null);
+		                cookie.setMaxAge(0);
+		                cookie.setPath("/");
+		                cookie.setHttpOnly(false);
+		                response.addCookie(cookie);
+
+		                session.setAttribute("msg", "Your email has been changed. Please log in again.");
+		                return "redirect:/signin?emailChanged=true";
+		            }
+		        }
+
+		        updatedEmployee.setEmpPosition(existingEmployee.getEmpPosition());
+		        updatedEmployee.setEmpDepartment(existingEmployee.getEmpDepartment());
+		        updatedEmployee.setEmpSalary(existingEmployee.getEmpSalary());
+		        updatedEmployee.setJoiningDate(existingEmployee.getJoiningDate());
+
+		        existingEmployee.setFullName(updatedEmployee.getFullName());
+		        existingEmployee.setAddress(updatedEmployee.getAddress());
+		        existingEmployee.setEmail(updatedEmployee.getEmail());
+		        existingEmployee.setPhone(updatedEmployee.getPhone());
+		        existingEmployee.setBirthDate(updatedEmployee.getBirthDate());
+
+
+		        userRepo.save(existingEmployee);
+
+		        session.setAttribute("msg", "Employee information updated successfully.");
+		        return "redirect:/manager/employeelist/showFormForUpdate/" + id;
+		    } catch (NoSuchElementException e) {
+		        session.setAttribute("msg", "Employee with this ID does not exist");
+		        return "redirect:/manager/employeelist/showFormForUpdate/" + id;
 		    }
-
-		    UserDtls existingEmployeeByEmail = userRepo.findByEmail(email);
-		    if (existingEmployeeByEmail == null) {
-		        log.info("User with this email does not exist");
-		        return ResponseEntity.badRequest().body("User with this email is not present in the database");
-		    }
-
-		    if (existingEmployeeByEmail.getId() != id) {
-		        log.info("Email does not match with the provided ID");
-		        return ResponseEntity.badRequest().body("Provided email does not match with the provided ID");
-		    }
-
-		    existingEmployeeId.setFullName(fullName);
-		    existingEmployeeId.setAddress(address);
-		    existingEmployeeId.setEmail(email);
-		    existingEmployeeId.setEmpPosition(empPosition);
-		    existingEmployeeId.setEmpDepartment(empDepartment);
-		    existingEmployeeId.setEmpSalary(empSalary);
-
-		    userService.saveEmployee(existingEmployeeId);
-		    log.info("Employee information updated successfully");
-		    return ResponseEntity.ok("Employee information updated successfully");
 		}
 
-		@GetMapping("/employeelist/deleteEmployee/{id}")
-		public String deleteEmployee(@PathVariable (value = "id")long id, HttpSession session) {
-		    UserDtls employee = this.userService.getEmployeeById(id);
-		    if (employee == null) {
-		        session.setAttribute("msg", "Employee with this ID does not exist");
-		    } else {
-		        this.userService.deleteEmployeeById(id);
-		        session.setAttribute("msg", "Employee deleted successfully");
-		    }
-		    return "redirect:/manager/employeelist";
-		}	
+
+
+			@GetMapping("/employeelist/deleteEmployee/{id}")
+			public String deleteEmployee(@PathVariable (value = "id")long id, HttpSession session) {
+				session.setAttribute("msg", "You don't have permission to delete employee");
+				return "redirect:/manager/employeelist";
+			}
 }

@@ -1,8 +1,8 @@
 package com.ness.emps.config;
 
 
-import java.util.logging.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +21,8 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	@Autowired
 	private UserRepository userRepo;
 	
-    private static final Logger log = Logger.getLogger(JwtAuthenticationFilter.class.getName());
+	Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
+
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

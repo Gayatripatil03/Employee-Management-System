@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:background-color="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>EmployeeList</title>
+    <link th:href="@{http://localhost:8080/css/employeelist.css}" rel="stylesheet"/>
+
+</head>
+<body>
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="#">Employees List</a>
+</nav>
+<section>
+<div class="container my-2">
+    <a th:href="@{/admin/employeelist}">Back to Employee List</a>
+    <a th:href = "@{/admin/employeelist/showNewEmployeeForm}" class="btn btn-primary btn-sm mb-3"> Add Employee </a>
+    <form th:action="@{/admin/employees}" method="get">
+    	<input id="txtSearch" type="text" name="keyword">
+    	<button type="submit">Go</button>
+    </form>
+    <table border="1" class="table table-striped table-responsive-md">
+        <thead>
+        <tr>
+        	<th>Id</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>MailId</th>
+            <th>Emp Position</th>
+            <th>Emp Department</th>
+            <th>Salary</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="employee: ${listEmployees}">
+            <td th:text="${employee.id}"></td>
+            <td th:text="${employee.fullName}"></td>
+            <td th:text="${employee.address}"></td>
+            <td th:text="${employee.email}"></td>
+            <td th:text="${employee.empPosition}"></td>
+            <td th:text="${employee.empDepartment}"></td>
+            <td th:text="${employee.empSalary}"></td>
+            <td>
+                <a th:href="@{/admin/employeelist/showFormForUpdate/{id}(id=${employee.id})}" class="btn btn-small btn-success ">Update</a>
+                <a th:href="@{/admin/employeelist/deleteEmployee/{id}(id=${employee.id})}" class="btn btn-small btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:if="${totalPages > 1}">
+        <div class="row">
+            <div class="col-sm-2">
+                Total Employee Count: [[${totalItems}]]
+                &nbsp;&nbsp;&nbsp;
+            </div>
+            <div class="col-sm-6">
+                <span>Pages:</span>
+                <span th:each="i: ${#numbers.sequence(1,totalPages)}">
+                    <a th:if="${currentPage != i}" th:href="@{'/admin/employeelist/page/' +${i} + '?sortField=' +${sortField} + '&sortDir=' +${SortDir}}">[[${i}]]</a>
+                    <span th:unless="${currentPage != i}">[[${i}]]</span>
+                </span>
+            </div>
+            <div class="col-sm-4 text-right">
+                <a th:if="${currentPage < totalPages}" th:href="@{'/admin/employeelist/page/' +${currentPage + 1}+ '?sortField=' +${sortField} + '&sortDir=' +${SortDir}}">Next</a>
+                <span th:unless="${currentPage < totalPages}">Next</span>
+                &nbsp;
+                <a th:if="${currentPage < totalPages}" th:href="@{'/admin/employeelist/page/' + ${totalPages}+ '?sortField=' +${sortField} + '&sortDir=' +${SortDir}}">Last</a>
+                <span th:unless="${currentPage < totalPages}">Last</span>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+<script type="text/javascript" th:src="@{/js/msgnotification.js}"></script>
+</body>
+</html>

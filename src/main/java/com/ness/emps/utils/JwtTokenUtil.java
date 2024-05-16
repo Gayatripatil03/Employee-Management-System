@@ -2,8 +2,11 @@ package com.ness.emps.utils;
 
 
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -22,48 +25,61 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.security.Keys;
 
-import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
 @Component
 public class JwtTokenUtil {
 	
-		@Autowired 
-		private UserRepository userRepo;
-		
-		@Autowired
-		private BCryptPasswordEncoder passwordEncoder;
-		
-		
-		private static final Logger log = Logger.getLogger(JwtTokenUtil.class.getName());
-		
-		private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-		private static final long EXPIRATION_TIME = 5 * 60 * 1000; 
-		
-		public String generateToken(String email,String role)
-		{
-			Date now = new Date();
-			Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
-			String token =  Jwts.builder()
-					.setSubject(email)
-					.claim("role", role)
-					.setIssuedAt(now)
-					.setExpiration(expiryDate)
-					.signWith(secretKey)
-					.compact();
-			
-			UserDtls user = userRepo.findByEmail(email);
-			if(user != null)
-			{
-				user.setToken(token);
-		        userRepo.save(user);
-	
-			}else {
-				return "User not found by this email";
-			}
-			
-			return token;
-	        
-		}
+	@Autowired 
+    private UserRepository userRepo;
+    
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+    
+	Logger log = LoggerFactory.getLogger(JwtTokenUtil.class);
+
+
+    
+    private static final long EXPIRATION_TIME = 5 * 60 * 1000; 
+    
+    private static final Key secretKey = generateSecretKey();
+
+    private static Key generateSecretKey() {
+        try {
+        	
+            KeyGenerator keyGen = KeyGenerator.getInstance(SignatureAlgorithm.HS256.getJcaName());
+            SecretKey secretKey = keyGen.generateKey();
+            return secretKey;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }    
+    public String generateToken(String email, String role) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
+        String token = Jwts.builder()
+                .setSubject(email)
+                .claim("role", role)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact();
+        
+        UserDtls user = userRepo.findByEmail(email);
+        if (user != null) {
+            user.setToken(token);
+            userRepo.save(user);
+        } else {
+            return "User not found by this email";
+        }
+        
+        return token;
+    }
 		public String validateToken(String token) {
 			try {
 				
@@ -141,5 +157,40 @@ public class JwtTokenUtil {
 		    Claims claims = extractAllClaims(token);
 		    return (String) claims.get("role");
 		}
+		
+		public static String encryptToken(String token) {
+	        try {
 
+	        	SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getEncoded(), "AES");
+	            
+
+	        	Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+	            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+	            byte[] encryptedBytes = cipher.doFinal(token.getBytes());
+	            return Base64.getEncoder().encodeToString(encryptedBytes);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return null;
+	        }
+	    }
+
+	    public static String decryptToken(String encryptedToken) {
+	        try {
+
+	        	SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getEncoded(), "AES");
+	            
+	            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+	            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+	            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedToken));
+	            return new String(decryptedBytes);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return null;
+	        }
+	    }
+	    
+	    public static String calculateExpirationTime() {
+
+	    	return "EXPIRATION_TIME";
+	    }
 }

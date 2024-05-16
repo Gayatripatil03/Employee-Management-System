@@ -1,0 +1,91 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: green;
+    color: #fff;
+    padding: 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    font-size: 24px;
+    color: #fff;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right .profile-section {
+    position: relative;
+}
+
+.profile-user {
+    width: 40px;
+    height: auto;
+}
+
+.welcome-msg {
+    margin-right: 10px;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    width: 135px;
+}
+
+.dropdown-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-menu ul li {
+    margin-bottom: 5px;
+}
+
+.dropdown-menu ul li a {
+    color: #333;
+    text-decoration: none;
+}
+
+.dropdown-menu ul li a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+
+.navbar-left .nav-link {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.navbar-left .nav-link:hover {
+    color: #ccc;
+}
+
+.navbar-left .nav-link.clicked-link {
+    color: #DC143C;
+}
+

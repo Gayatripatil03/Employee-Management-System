@@ -50,8 +50,13 @@ public class UserDtls {
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits long and contain only numbers")
 	@Column
 	private String phone;
+    
+    @Column(name = "birth_date")
+    private String birthDate;
+    
+    @Column(name = "joining_date")
+    private String joiningDate;
 
-    @NotNull(message = "Password is required")
 	@Column
 	private String password;
 
@@ -60,14 +65,14 @@ public class UserDtls {
 	@Column
 	private String role;
 	
-	private String expirationTime;
+	private String expirationTime = "5 min";
 	
 	public UserDtls() {
 		
 	} 
 	
 	public UserDtls(Long id,String fullName,String token, String email, String address, String empPosition, String empDepartment,
-			Float empSalary, String phone, String password, String role,String expirationTime) {
+			Float empSalary, String phone,String birthDate,String joiningDate,String password, String role,String expirationTime) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -78,8 +83,11 @@ public class UserDtls {
 		this.empDepartment = empDepartment;
 		this.empSalary = empSalary;
 		this.phone = phone;
+		this.birthDate = birthDate;
+		this.joiningDate = joiningDate;
 		this.password = password;
 		this.role = role;
+		this.expirationTime = expirationTime;
 	}
 	
 	public Long getId() {
@@ -154,6 +162,15 @@ public class UserDtls {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
+	
+	public String getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(String birthDate) {
+		this.birthDate = birthDate;
+	}
+
 
 	public String getPassword() {
 		return password;
@@ -176,14 +193,22 @@ public class UserDtls {
 	}
 
 	public void setExpirationTime(String expirationTime) {
-		this.expirationTime = expirationTime;
+		this.expirationTime =  expirationTime;
 	}
 
+	public String getJoiningDate() {
+		return joiningDate;
+	}
+
+	public void setJoiningDate(String joiningDate) {
+		this.joiningDate = joiningDate;
+	}
+
+	@Override
 	public String toString() {
 		return "UserDtls [id=" + id + ", fullName=" + fullName + ", token=" + token + ", email=" + email + ", address="
 				+ address + ", empPosition=" + empPosition + ", empDepartment=" + empDepartment + ", empSalary="
-				+ empSalary + ", phone=" + phone + ", password=" + password + ", role=" + role + ", expirationTime="
+				+ empSalary + ", phone=" + phone + ", birthDate=" + birthDate + ",joiningDate=" + joiningDate + ", password=" + password + ", role=" + role + ", expirationTime="
 				+ expirationTime + "]";
-	}
-	   
+	}   
 }

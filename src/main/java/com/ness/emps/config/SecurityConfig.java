@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.ness.emps.service.UserServiceImpl;
 import com.ness.emps.utils.JwtTokenUtil;
 
 @Configuration
@@ -32,6 +33,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsServiceImpl userDetailsService; 
     
+    @Autowired
+    private UserServiceImpl userServiceImpl;
+    
     @Bean
     public BCryptPasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -40,6 +44,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public UserDetailsServiceImpl userDetailsServiceImpl() {
         return new UserDetailsServiceImpl();
+    }
+    
+    @Bean
+    public UserServiceImpl userServiceImpl() {
+        return new UserServiceImpl();
     }
     
     @Bean
@@ -53,10 +62,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenUtil(),userDetailsServiceImpl());
-    }  
+    public TokenGenerationFilter tokenGenerationFilter() {
+        return new TokenGenerationFilter(jwtTokenUtil(),userServiceImpl(),userDetailsServiceImpl());
+    } 
+    
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -78,7 +89,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasRole("USER")
                 .antMatchers("/manager/**").hasRole("MANAGER")
-                .antMatchers("/generate_token", "/login_req", "/validatetoken", "/", "/testdemo", "/signin", "/register", "/createUser", "/loadForgotPassword", "/forgotPassword", "/loadResetPassword/{id}", "/changePassword").permitAll()
+                .antMatchers("/generate_token","/login_req","/style","/validatetoken", "/", "/testdemo", "/signin", "/register", "/createUser", "/loadForgotPassword", "/forgotPassword", "/loadResetPassword/{id}",
+                		"/sendEmail","/sendBirthdayEmails","/sendOnboardingEmails","/changePassword","/js/**","/css/**","/images/**").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .formLogin()
@@ -101,7 +113,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     })
                     .permitAll()
             .and()
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(tokenGenerationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf().disable()
             .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

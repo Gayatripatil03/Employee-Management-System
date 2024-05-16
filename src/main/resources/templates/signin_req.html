@@ -3,14 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Signin Form</title>
+    <link th:href="@{http://localhost:8080/css/signin_req.css}" rel="stylesheet"/>
+    <link th:href="@{http://localhost:8080/css/forgotpassword.css}" rel="stylesheet"/> 
+    
 </head>
 <body>
 <section>
     <div class="container p-5">
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <div class="card-header text-center fs-4">Signin Page</div>
+                <div class="card-header1 text-center fs-4">Signin Page</div>
                 
+                
+                <div th:if="${session.msg}" class="error-text">
+            			<p th:text="${session.msg}"></p>
+            			<th:block th:text="${#session.removeAttribute('msg')}"></th:block>
+        		</div>
+        		
                 <div th:if="${error}" class="alert alert-danger">
     				<span th:text="${error}"></span>
 				</div>
@@ -18,35 +27,31 @@
                   <div th:if="${param.logout}" class="alert alert-success">
                   Logout Sucessfully</div>
                   
-                <div class="card-body">
+                  <div th:if="${param.emailChanged}" class="alert alert-info">
+                  Your email has been changed.Please log in again</div>
+                  
+                  <div th:if="${param.invalid}" class="alert alert-invalid">
+                  Invalid username and password</div>
+                  
+                <div class="form-body">
                     <form action="/login_req" method="post">
                         <div class="mb-3">
-                            <label>Enter your email id</label>
-                            <input type="text" name="username" class="form-control" autocomplete="off">
+                            <input type="text" name="username" placeholder="Enter email" class="form-control1" required autofocus="autofocus">
                         </div>
                         <div class="mb-3">
-                            <label>Enter password</label>
-                            <input type="password" name="password" class="form-control">
+                            <input type="password" name="password" placeholder="Password" class="form-control1" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 to 12 characters" required autofocus="autofocus">
                         </div>
-                        <div class="mb-3">
-                            <label>Enter token</label>
-                            <input type="token" name="token" class="form-control">
-                        </div>
-                        
-
-                        <button class="btn btn-success col-md-12">Login</button>
-                     
+                        <button class="btn1 btn-success col-md-12">Login</button>
                     </form>
                     
                     <div class="text-center mt-2">
-                    	<a href="loadForgotPassword" class="text-decoration-none fs-5">Forgot Password</a>
+                    	<a href="loadForgotPassword" class="text-decoration-none fs-5">Forgotten Password?</a>
                     </div>
-     
-
-            </div>
-        </div>
-    </div>
+                </div>
+          </div>
+     </div>
  </div>
+
 </section>
 </body>
 </html>

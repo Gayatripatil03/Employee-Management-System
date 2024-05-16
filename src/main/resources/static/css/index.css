@@ -1,0 +1,21 @@
+
+.index-content {
+    padding: 70px;
+    background-color: #E0FFFF;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 100px auto;
+    max-width: 800px;
+    text-align: justify;
+}
+
+.index-content h1 {
+    font-size: 2rem;
+    color: #000000;
+}
+
+.index-content p {
+    font-size: 1.1rem;    
+    color: #000000;
+    line-height: 1.6;
+}

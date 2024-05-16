@@ -22,8 +22,6 @@ private UserDtls user;
 	}
 
 	
-
-
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(user.getRole());
 		return Arrays.asList(simpleGrantedAuthority);

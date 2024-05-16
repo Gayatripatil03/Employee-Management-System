@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Management System</title>
+    <link th:href="@{http://localhost:8080/css/update_employee.css}" rel="stylesheet"/> 
+</head>
+<body>
+<div class="container">
+    <h1>Employee Management System</h1>
+    <hr>
+    <h2>Update Employee</h2>
+    <div th:if="${session.msg}" class="error-text">
+         <p th:text="${session.msg}"></p>
+         <th:block th:text="${#session.removeAttribute('msg')}"></th:block>
+    </div>
+    <form action="#" th:action="@{/user/employeelist/showFormForUpdate/saveUpdatedEmployee/{id}(id=${employee.id})}" th:object="${employee}" method="POST">
+
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{role}" />
+
+       
+        <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error"></div>
+        <input type="text" th:field="*{fullName}" name="fullName" placeholder="Enter your name" class="form-control mb-4 col-4" required autofocus="autofocus">
+        <div th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="error"></div>
+        <input type="text" th:field="*{address}" name="address" placeholder="Enter your Address" class="form-control mb-4 col-4" required autofocus="autofocus">
+        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></div>
+        <input type="email" th:field="*{email}" name="email" placeholder="Enter your email" class="form-control mb-4 col-4" required autofocus="autofocus">
+        <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error"></div>
+        <input type="tel" th:field="*{phone}" name="phone" placeholder="Enter your phone no" onkeyup="this.value = this.value.replace(/[^0-9-]/g, '');" minlength="0" maxlength="10" class="form-control mb-4 col-4" required autofocus="autofocus">
+        <label for="birthDate">Date of Birth:</label><br>
+        <div th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}" class="error"></div>
+        <input type="date" th:field="*{birthDate}" name="birthDate" placeholder="dd-mm-yyyy" class="form-control mb-4 col-4" required>
+     
+
+        
+        <input type="text" class="form-control mb-4 col-4 noneditable" th:value="${employee.empPosition}" readonly th:placeholder="${employee.empPosition ?: 'Enter Employee Position'}">
+        <input type="text" class="form-control mb-4 col-4 noneditable" th:value="${employee.empDepartment}" readonly th:placeholder="${employee.empDepartment ?: 'Enter Employee Department'}">
+        <label for="joiningDate">Joining Date:</label><br>
+        <input type="date" class="form-control mb-4 col-4 noneditable" th:value="${employee.joiningDate}" readonly th:placeholder="${employee.joiningDate ?: 'dd-mm-yyyy'}">
+        <input type="text" class="form-control mb-4 col-4 noneditable" th:value="${employee.empSalary}" readonly th:placeholder="${employee.empSalary ?: 'Enter Employee Salary'}">
+        
+        <button type="submit" class="btn btn-info col-2"> Update Employee</button>
+    </form>
+    <hr>
+    <a th:href="@{/user/employeelist}">Back to Employee List</a>
+</div>
+<script type="text/javascript" th:src="@{/js/msgnotification.js}"></script>
+<script type="text/javascript" th:src="@{/js/datepicker.js}"></script>
+</body>
+</html>

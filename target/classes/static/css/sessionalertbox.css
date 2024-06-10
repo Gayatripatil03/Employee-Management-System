@@ -1,0 +1,35 @@
+.alert-box {
+    position: fixed;
+    bottom: 550px;
+    right: 600px;
+    width: 300px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    color: black;
+    z-index: 1000;
+}
+
+.alert-box p {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.alert-button {
+    background-color: blue;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.alert-button:hover {
+    background-color: #0056b3;
+}

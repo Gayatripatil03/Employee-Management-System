@@ -1,11 +1,15 @@
 package com.ness.emps.model;
 
+import java.util.Arrays;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.validation.constraints.*;
+
 
 
 @Entity
@@ -67,12 +71,24 @@ public class UserDtls {
 	
 	private String expirationTime = "5 min";
 	
+	@Lob
+	private byte[] profileImage;
+	
 	public UserDtls() {
 		
 	} 
 	
-	public UserDtls(Long id,String fullName,String token, String email, String address, String empPosition, String empDepartment,
-			Float empSalary, String phone,String birthDate,String joiningDate,String password, String role,String expirationTime) {
+	public UserDtls(Long id,
+			@NotNull(message = "Full name is required") @Pattern(regexp = "^[a-zA-Z ]+$", message = "Full name can only contain alphabetic characters and spaces") String fullName,
+			String token, @NotNull(message = "Email is required") @Email(message = "Invalid email format") String email,
+			@NotNull(message = "Address is required") @Size(min = 4, max = 30, message = "Address must be between 4 and 30 characters long") String address,
+			@Pattern(regexp = "^[a-zA-Z ]+$", message = "Employee position can only contain alphabetic characters and spaces") String empPosition,
+			@Pattern(regexp = "^[a-zA-Z ]+$", message = "Employee department can only contain alphabetic characters and spaces") String empDepartment,
+			@DecimalMin(value = "0.01", message = "Employee salary must be greater than 0") Float empSalary,
+			@NotNull(message = "Phone is required") @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits long and contain only numbers") String phone,
+			String birthDate, String joiningDate, String password,
+			@NotNull(message = "Role is required") @Pattern(regexp = "ROLE_(USER|ADMIN|MANAGER)", message = "Role must be ROLE_USER, ROLE_ADMIN, or ROLE_MANAGER") String role,
+			String expirationTime, byte[] profileImage) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -88,8 +104,11 @@ public class UserDtls {
 		this.password = password;
 		this.role = role;
 		this.expirationTime = expirationTime;
+		this.profileImage = profileImage;
 	}
-	
+
+
+
 	public Long getId() {
 		return id;
 	}
@@ -203,12 +222,25 @@ public class UserDtls {
 	public void setJoiningDate(String joiningDate) {
 		this.joiningDate = joiningDate;
 	}
+	
+	
+
+	public byte[] getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(byte[] profileImage) {
+		this.profileImage = profileImage;
+	}
 
 	@Override
 	public String toString() {
 		return "UserDtls [id=" + id + ", fullName=" + fullName + ", token=" + token + ", email=" + email + ", address="
 				+ address + ", empPosition=" + empPosition + ", empDepartment=" + empDepartment + ", empSalary="
-				+ empSalary + ", phone=" + phone + ", birthDate=" + birthDate + ",joiningDate=" + joiningDate + ", password=" + password + ", role=" + role + ", expirationTime="
-				+ expirationTime + "]";
-	}   
+				+ empSalary + ", phone=" + phone + ", birthDate=" + birthDate + ", joiningDate=" + joiningDate
+				+ ", password=" + password + ", role=" + role + ", expirationTime=" + expirationTime + ", profileImage="
+				+ Arrays.toString(profileImage) + "]";
+	}
+
+	  
 }

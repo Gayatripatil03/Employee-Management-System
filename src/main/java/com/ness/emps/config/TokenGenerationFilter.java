@@ -23,7 +23,6 @@ import com.ness.emps.utils.JwtTokenUtil;
 public class TokenGenerationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
-
     private final UserServiceImpl userService;
 	private UserDetailsServiceImpl userDetailsServiceImpl;
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Employee Management System</title>
     <link th:href="@{http://localhost:8080/css/new_employee.css}" rel="stylesheet"/> 
+    <link th:href="@{http://localhost:8080/css/sessionalertbox.css}" rel="stylesheet"/> 
 </head>
 <body>
 <div class="container">
@@ -11,9 +12,9 @@
     <hr>
     <h2>Add Employee</h2>
     <div th:if="${session.msg}" class="error-text">
-         <p th:text="${session.msg}"></p>
-         <th:block th:text="${#session.removeAttribute('msg')}"></th:block>
-    </div>
+           <p th:text="${session.msg}" style="display: none;"></p>
+           <th:block th:text="${#session.removeAttribute('msg')}"></th:block>
+       </div>
     <form action="#" th:action="@{/manager/employeelist/saveEmployee}" th:object = "${employee}" method="POST">
         <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="error"></div>
         <input type="text" th:field="*{fullName}" name="fullName" placeholder="Employee Name" class="form-control mb-4 col-4" required autofocus="autofocus">
@@ -40,6 +41,7 @@
     <hr>
     <a th:href="@{/manager/employeelist}">Back to Employee List</a>
 </div>
-<script type="text/javascript" th:src="@{/js/msgnotification.js}"></script>
+<script type="text/javascript" th:src="@{/js/sessionalertbox.js}"></script>
+<script type="text/javascript" th:src="@{/js/datepicker.js}"></script>
 </body>
 </html>

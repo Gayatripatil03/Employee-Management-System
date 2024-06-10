@@ -16,8 +16,6 @@ public interface UserRepository extends JpaRepository<UserDtls,Long>{
 	
 	public UserDtls findByEmailAndPhone(String email,String phone);
 	
-	public UserDtls findByEmailAndPassword(String email,String password);
-	
 	public UserDtls findByPhone(String phone);
 	
 	public UserDtls findByEmailAndRole(String email,String role);
@@ -33,4 +31,11 @@ public interface UserRepository extends JpaRepository<UserDtls,Long>{
 
 	@Query("SELECT u FROM UserDtls u WHERE MONTH(u.joiningDate) = :month AND DAY(u.joiningDate) = :day")
     List<UserDtls> findByJoiningDateMonthAndDay(@Param("month") int month, @Param("day") int day);
+	
+	@Query("SELECT u FROM UserDtls u WHERE u.empDepartment = ?1 AND u.role = ?2")
+    List<UserDtls> findByDepartmentAndRole(String department, String role);
+	
+	@Query(value = "SELECT * FROM user_dtls u WHERE (u.full_name LIKE %:keyword% OR u.emp_position LIKE %:keyword% OR u.address LIKE %:keyword% OR u.email LIKE %:keyword% OR u.emp_salary LIKE %:keyword% OR id LIKE %:keyword%) AND u.emp_dept = :department", nativeQuery = true)
+    List<UserDtls> findByKeywordAndDepartment(@Param("keyword") String keyword, @Param("department") String department);
+
 }

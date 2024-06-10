@@ -3,6 +3,8 @@ package com.ness.emps.service;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.ness.emps.model.UserDtls;
 
 
@@ -36,5 +38,11 @@ public interface UserService {
 	
     public List<UserDtls> findBYKeyword(String keyword);
 
-	
+    public List<UserDtls> findByDepartmentAndRole(String department, String role);
+    
+	public List<UserDtls> findByKeywordAndDepartment(String keyword, String department, String role);
+
+	public void uploadProfileImage(MultipartFile file, Long userId);
+
+
 }

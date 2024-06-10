@@ -12,7 +12,7 @@ window.onload = function() {
 
             setTimeout(function() {
                 errorMessage.style.display = 'none';
-            }, 2000);
+            }, 10000);
         }
     }
 };

@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function() {
 
     var dropdownButton = document.getElementById("navbarDropdown");

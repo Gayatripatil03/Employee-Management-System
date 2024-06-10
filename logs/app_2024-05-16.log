@@ -13723,3 +13723,5 @@ Caused by: java.lang.ClassNotFoundException: com.ness.emps.service.UserServiceIm
 2024-05-16 14:18:14,935 TRACE org.hibernate.type.descriptor.sql.BasicExtractor [http-nio-8080-exec-7] extracted value ([token14_0_] : [VARCHAR]) - [null]
 2024-05-16 14:18:14,935 DEBUG org.hibernate.SQL [http-nio-8080-exec-7] select count(userdtls0_.id) as col_0_0_ from user_dtls userdtls0_
 2024-05-16 14:18:14,944 TRACE org.hibernate.type.descriptor.sql.BasicExtractor [http-nio-8080-exec-7] extracted value ([col_0_0_] : [BIGINT]) - [25]
+2024-05-16 17:14:53,026 TRACE org.hibernate.type.spi.TypeConfiguration$Scope [RMI TCP Connection(196)-127.0.0.1] Handling #sessionFactoryClosed from [org.hibernate.internal.SessionFactoryImpl@65fa65b8] for TypeConfiguration
+2024-05-16 17:14:53,027 DEBUG org.hibernate.type.spi.TypeConfiguration$Scope [RMI TCP Connection(196)-127.0.0.1] Un-scoping TypeConfiguration [org.hibernate.type.spi.TypeConfiguration$Scope@9d2a81e] from SessionFactory [org.hibernate.internal.SessionFactoryImpl@65fa65b8]

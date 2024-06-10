@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Employee Management System</title>
     <link th:href="@{http://localhost:8080/css/update_employee.css}" rel="stylesheet"/> 
+    <link th:href="@{http://localhost:8080/css/sessionalertbox.css}" rel="stylesheet"/> 
+    
 
 </head>
 <body>
@@ -12,8 +14,8 @@
     <hr>
     <h2>Profile Page</h2>
     <div th:if="${session.msg}" class="error-text">
-        <p th:text="${session.msg}"></p>
-        <th:block th:text="${#session.removeAttribute('msg')}"></th:block>
+           <p th:text="${session.msg}" style="display: none;"></p>
+           <th:block th:text="${#session.removeAttribute('msg')}"></th:block>
     </div>
     <form action="#" th:action="@{/manager/employeelist/showFormForUpdate/saveUpdatedEmployee/{id}(id=${employee.id})}" th:object="${employee}" method="POST">
 
@@ -45,7 +47,7 @@
     <hr>
     <a th:href="@{/manager/home}">Back to Manager Home Page</a>
 </div>
-<script type="text/javascript" th:src="@{/js/msgnotification.js}"></script>
+<script type="text/javascript" th:src="@{/js/sessionalertbox.js}"></script>
 <script type="text/javascript" th:src="@{/js/datepicker.js}"></script>
 </body>
 </html>

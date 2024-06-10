@@ -1,4 +1,3 @@
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
@@ -123,8 +122,6 @@ tr:nth-child(odd) {
     padding-left: 20px;
 }
 
-
-
 .col-sm-6 {
     display: flex;
     align-items: center;
@@ -137,17 +134,3 @@ tr:nth-child(odd) {
 .col-sm-6 a {
     margin-right: 10px;
 }
-
-.error-text {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    position: fixed;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-}
-

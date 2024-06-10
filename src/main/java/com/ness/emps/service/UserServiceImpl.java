@@ -1,8 +1,6 @@
 package com.ness.emps.service;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,16 +11,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ness.emps.config.CustomUserDetails;
 import com.ness.emps.model.UserDtls;
 import com.ness.emps.repository.UserRepository;
 import com.ness.emps.utils.JwtTokenUtil;
+
+import java.io.IOException;
 
 
 @Service
@@ -36,9 +38,6 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	
 		@Autowired
 	    private JwtTokenUtil jwtTokenUtil;
-		
-		@Autowired
-		private UserService  userService;
 		
 		
 		Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -162,5 +161,38 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	    public List<UserDtls> findBYKeyword(String keyword){
 	    	return userRepo.findByKeyword(keyword);
 	    }
+
+		public List<UserDtls> findByDepartmentAndRole(String department, String role) {
+	        return userRepo.findByDepartmentAndRole(department, role);
+		}
+		
+		public List<UserDtls> findByKeywordAndDepartment(String keyword, String department, String role) {
+
+			List<UserDtls> employees = userRepo.findByDepartmentAndRole(department, role);
+
+		    if (keyword == null || keyword.isEmpty()) {
+		        employees.add(userRepo.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
+		        return employees;
+		    } else {
+		        List<UserDtls> matchingEmployees = userRepo.findByKeywordAndDepartment(keyword, department);
+
+		        if (!matchingEmployees.isEmpty()) {
+		            return matchingEmployees;
+		        } else {
+		            return new ArrayList<>();
+		        }
+		    }
+		}
+		
+		public void uploadProfileImage(MultipartFile file, Long userId) {
+	        try {
+	            UserDtls user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+	            user.setProfileImage(file.getBytes());
+	            userRepo.save(user);
+	        } catch (IOException ex) {
+	            throw new RuntimeException("Failed to upload profile image", ex);
+	        }
+	    }
+
 
 }

@@ -5,7 +5,7 @@
     <title>User Page</title>
     <link th:href="@{http://localhost:8080/css/layoutpage.css}" rel="stylesheet"/>
     <link th:href="@{http://localhost:8080/css/changepassword.css}" rel="stylesheet"/>
-
+    <link th:href="@{http://localhost:8080/css/sessionalertbox.css}" rel="stylesheet"/> 
 </head>
 <body>
 <nav class="navbar">
@@ -13,16 +13,27 @@
         <a class="navbar-brand" href="#">Employee Management System</a>
         <a class="nav-link" href="/user/employeelist" id="employeeListLink">Employee List</a>
     </div>
+
     <div class="navbar-right">
         <div class="welcome-msg">
             <span>Welcome, <span th:text="${user.fullName}"></span></span>
         </div>
+
         <div class="profile-section">
             <a href="#" id="profile-toggle">
-                <img th:src="@{http://localhost:8080/images/profile-user.png}" alt="Profile" class="profile-user" id="userLogo">
+                <img th:src="${user.profileImage != null ? '/user/profileImage/' + user.id : 'http://localhost:8080/images/profile-user.png'}" alt="Profile" class="profile-user" id="userLogo">
             </a>
             <div class="dropdown-menu" id="userDropdown">
                 <ul>
+                    <li>
+                        <div class="profile-user-container">
+                            <img th:src="${user.profileImage != null ? '/user/profileImage/' + user.id : 'http://localhost:8080/images/profile-user.png'}" alt="Profile" class="profileimage-user" id="userLogoDropdown">
+                            <div class="camera-icon-container">
+                                <img th:src="@{http://localhost:8080/images/camera.png}" alt="Upload Image" class="camera-icon" id="camera-icon">
+                            </div>
+                            <div class="profile-text">Change or add profile picture</div>
+                        </div>
+                    </li>
                     <li><a href="/user/profile">View Profile</a></li>
                     <li><a href="/user/changePass">Change Password</a></li>
                     <li><a href="/logout">Logout</a></li>
@@ -36,8 +47,34 @@
     <div th:replace="${contentpart}"></div>
 </div>
 
-<script type="text/javascript" th:src="@{/js/layoutpage.js}"></script>
-<script type="text/javascript" th:src="@{/js/msgnotification.js}"></script>
+<div id="sessionAlertBox" class="alert-box">
+        <p id="sessionMessage"></p>
+        <button id="sessionAlertButton" class="alert-button">OK</button>
+</div>
+    
+<div id="popupContainer" class="popup-container">
+    <div class="popup-content">
+        <p>Change your profile picture</p>
+        
+        <img th:src="${user.profileImage != null ? '/user/profileImage/' + user.id : 'http://localhost:8080/images/profile-user.png'}" alt="Profile" class="profile-image" id="selectedProfileImage">
+        <div id="imageFileNameContainer" class="image-file-name"></div>
+        <div class="button-container">
+            <div class="button-group">
+                <button id="addPictureButton">Add Picture</button>
+                <input type="file" id="fileInput" accept="image/jpeg, image/png" style="display: none;">
+                <span id="selectedFileName" class="file-name"></span>     
+            </div>
+            <div class="button-group2">
+                <button id="closeButton">Close</button>
+            </div>
+            <div class="button-savechange">
+                <button id="saveButton" style="display: none;">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script type="text/javascript" th:src="@{/js/sessionalertbox.js}"></script>
+<script type="text/javascript" th:src="@{/js/layoutpage.js}"></script>
 </body>
 </html>

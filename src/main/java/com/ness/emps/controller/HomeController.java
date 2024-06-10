@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -67,7 +68,7 @@ public class HomeController {
 		
 		Logger log = LoggerFactory.getLogger(HomeController.class);
 		
-		@Scheduled(cron = "0 0 0 * * *")
+		@Scheduled(cron = "0 * * * * *")
 		@GetMapping("/sendBirthdayEmails")
 		public ResponseEntity<String> sendBirthdayEmails() {
 		    boolean success = mailnotificationService.sendBirthdayEmails();
@@ -80,7 +81,7 @@ public class HomeController {
 		    }
 		}
 		
-		@Scheduled(cron = "0 0 0 * * *")
+		@Scheduled(cron = "0 * * * * *")
 		@GetMapping("/sendOnboardingEmails")
 		public ResponseEntity<String> sendOnboardingEmails() {
 		    boolean success = mailnotificationService.sendOnboardingEmails();
@@ -93,7 +94,7 @@ public class HomeController {
 		    }
 		}
 		
-		@Scheduled(cron = "0 0 0 * * *")
+		@Scheduled(cron = "0 * * * * *")
 		@GetMapping("/sendWorkAnniversaryEmails")
 		public ResponseEntity<String> sendWorkAnniversaryEmails() {
 		    boolean success = mailnotificationService.sendWorkAnniversaryEmails();
@@ -113,8 +114,7 @@ public class HomeController {
 	    
 	    @GetMapping("/signin")
 	    public String signin() {
-	          
-	        return "signin_req";
+    	  return "signin_req";  
 	    }
 	    
 	    
@@ -203,9 +203,11 @@ public class HomeController {
 	        String validationMessage = userService.authenticateUser(username, password, tokenWithBearer);
 	        if (validationMessage.equals("Invalid username or password")) {
 	            session.setAttribute("msg", "Invalid username or password");
+	            session.removeAttribute("msg");
 	            return "redirect:/signin?invalid=true";
 	        } else if (!validationMessage.equals("valid")) {
 	            session.setAttribute("msg", validationMessage);
+	            session.removeAttribute("msg");
 	            return "redirect:/signin";
 	        } else {
 	            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -251,40 +253,40 @@ public class HomeController {
 
  
 	    @PostMapping("/createUser")
-	    public String createUser(@Valid @ModelAttribute UserDtls user,BindingResult bindingResult, HttpSession session) {
-	    	log.info("Entered into createUser method");
-	    	log.info("User values are: "+user);
-	     
+	    public String createUser(@Valid @ModelAttribute UserDtls user, BindingResult bindingResult, HttpSession session) {
+	        log.info("Entered into createUser method");
+	        log.info("User values are: " + user);
+
 	        if (bindingResult.hasErrors()) {
 	            log.warn("Validation error occurs ");
-	             StringBuilder errorMessage = new StringBuilder("Validation errors occurred: ");
-	             log.info("There is problem for validation parameters: "+errorMessage);
-	             bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()));
-	             
-	             if (bindingResult.getFieldError("password") != null) {
-	                 errorMessage.append("Password validation failed. ");
-	             }
-	             
-	             session.setAttribute("msg", errorMessage.toString());
-	             return "redirect:/register";
-	        } 
-	         
-	    
-	    	 
+	            StringBuilder errorMessage = new StringBuilder("Validation errors occurred: ");
+	            log.info("There is problem for validation parameters: " + errorMessage);
+	            bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()));
+
+	            if (bindingResult.getFieldError("password") != null) {
+	                errorMessage.append("Password validation failed. ");
+	            }
+
+	            session.setAttribute("msg", errorMessage.toString());
+	            return "redirect:/register";
+	        }
+
 	        boolean emailExists = userService.checkEmail(user.getEmail());
-	    	log.info("emailExists result is: "+emailExists);
-	
+	        log.info("emailExists result is: " + emailExists);
+
 	        boolean phoneExists = userService.checkPhoneNumber(user.getPhone());
-	    	log.info("phoneExists result is: "+phoneExists);
-	
+	        log.info("phoneExists result is: " + phoneExists);
+
 	        if (emailExists) {
+	        	log.info("Email ID already exists session msg is displayed.");
 	            session.setAttribute("msg", "Email ID already exists.");
 	        } else if (phoneExists) {
+	        	log.info("User with same phone no is already registered msg is displayed.");
 	            session.setAttribute("msg", "User with same phone no is already registered.");
 	        } else {
-		    	log.info("Entered for createUser userService method");
+	            log.info("Entered for createUser userService method");
 	            UserDtls createdUser = userService.createUser(user);
-		    	log.info("Completed with createUser userService method");
+	            log.info("Completed with createUser userService method");
 	            if (createdUser != null) {
 	                session.setAttribute("msg", "Registered successfully.");
 	            } else {
@@ -292,7 +294,9 @@ public class HomeController {
 	            }
 	        }
 	        return "redirect:/register";
-	    }  
+	    }
+
+ 
 	
 	    @GetMapping("/loadForgotPassword")
 	    public String loadForgotPassword() {

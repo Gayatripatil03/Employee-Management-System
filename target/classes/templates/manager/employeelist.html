@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>EmployeeList</title>
     <link th:href="@{http://localhost:8080/css/employeelist.css}" rel="stylesheet"/>
+    <link th:href="@{http://localhost:8080/css/sessionalertbox.css}" rel="stylesheet"/> 
 </head>
 <body>
 <nav class="navbar navbar-light bg-light">
@@ -13,7 +14,7 @@
 <div class="container my-2">
 
 		<div th:if="${session.msg}" class="error-text">
-           <p th:text="${session.msg}"></p>
+           <p th:text="${session.msg}" style="display: none;"></p>
            <th:block th:text="${#session.removeAttribute('msg')}"></th:block>
        </div>
        
@@ -27,7 +28,7 @@
         <thead>
         <tr>
         	<th>
-                <a th:href="@{'/manager/employeelist/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reverseSortDir}}">Id</a>
+                <a th:href="@{'/manager/employeelist/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reverseSortDir}}">Emp Id</a>
             </th>
             <th>
                 <a th:href="@{'/manager/employeelist/page/' + ${currentPage} + '?sortField=fullName&sortDir=' + ${reverseSortDir}}">Name</a>
@@ -90,6 +91,6 @@
     </div>
 </div>
 </section>
-<script type="text/javascript" th:src="@{/js/msgnotification.js}"></script>
+<script type="text/javascript" th:src="@{/js/sessionalertbox.js}"></script>
 </body>
 </html>

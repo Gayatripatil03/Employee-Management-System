@@ -1,5 +1,3 @@
-
-
 .background-container {
     position: fixed;
     top: 40px;
@@ -11,22 +9,6 @@
     background-repeat: no-repeat;
     z-index: -1;
 }
-
-.error-text {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 20px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    position: fixed;
-    top: 10px;
-    left: 65%;
-    transform: translateX(-50%);
-    z-index: 2;
-    width: 400px; 
-    text-align: center; 
-}
-
 
 .register-container {
     position: absolute;
@@ -126,3 +108,79 @@ label{
     filter: invert(50%) grayscale(0.7); 
 }
 
+
+.register-custom-alert {
+    position: fixed;
+    top: 40px;
+    left: 65%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    color: black;
+    padding: 30px;
+    border-radius: 5px;
+    z-index: 9999;
+    display: none;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.custom-alert-message {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.register-alert-button {
+    background-color: blue;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.register-alert-button:hover {
+    background-color: darkblue;
+}
+
+
+.session-custom-alert {
+    position: fixed;
+    top: 40px;
+    left: 65%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    color: black;
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 9999;
+    display: none;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.session-alert-message {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+
+.session-alert-button {
+    background-color: blue;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.session-alert-button:hover {
+    background-color: darkblue;
+}
